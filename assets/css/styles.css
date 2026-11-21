@@ -1,0 +1,556 @@
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+:root {
+  --bg: #f4f5f2;
+  --surface: #ffffff;
+  --text: #1c1f1d;
+  --text-muted: #5f6661;
+  --border: #dde0dc;
+
+  --felt: #1f6b4a;
+  --felt-edge: #17543a;
+  --felt-text: #e8f3ec;
+
+  --card-bg: #ffffff;
+  --card-red: #c62f3a;
+  --card-black: #1c1f1d;
+  --card-back: #2f4a8a;
+
+  --hit: #ffffff;
+  --stand: #f0c419;
+  --double: #22a16b;
+  --split: #3bb5b0;
+  --surrender: #8a5cc7;
+
+  --good: #1f8f5c;
+  --good-bg: #e5f5ec;
+  --bad: #c62f3a;
+  --bad-bg: #fbe8ea;
+
+  --radius: 12px;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 16px rgb(0 0 0 / 0.06);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121513;
+    --surface: #1b1f1c;
+    --text: #e9ece9;
+    --text-muted: #9aa39d;
+    --border: #2c322e;
+    --felt: #18533a;
+    --felt-edge: #10402c;
+    --hit: #2a302c;
+    --good-bg: #163325;
+    --bad-bg: #3a1b1f;
+    --good: #4fd08f;
+    --bad: #ff7a85;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.3);
+  }
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+button,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+kbd {
+  font-family: inherit;
+  font-size: 0.7em;
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  opacity: 0.55;
+}
+
+/* ==========================================================================
+   Header / footer
+   ========================================================================== */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px 8px;
+}
+
+.site-title {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+
+.stats {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+}
+
+.stat {
+  min-width: 64px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.stat dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-footer {
+  margin-top: auto;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+.layout {
+  display: grid;
+  gap: 16px;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 8px 16px;
+}
+
+/* ==========================================================================
+   Table & cards
+   ========================================================================== */
+.table {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+  background: radial-gradient(ellipse at center, var(--felt) 0%, var(--felt-edge) 100%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--felt-text);
+}
+
+.hand__label {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.hand__total {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.15);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.hand__cards {
+  display: flex;
+  gap: 12px;
+  min-height: 126px;
+}
+
+/*
+ * Card = outer box (slides in when dealt) > inner (rotates to flip)
+ *        > front and back faces (each hides its reverse side).
+ */
+.card {
+  --deal-ms: 300ms;
+  --flip-ms: 500ms;
+  position: relative;
+  width: 88px;
+  height: 126px;
+  flex: none;
+  perspective: 600px;
+  color: var(--card-black);
+  animation: deal var(--deal-ms) cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.card__inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform var(--flip-ms) ease-in-out;
+}
+
+.card.is-facedown .card__inner {
+  transform: rotateY(180deg);
+}
+
+.card__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: var(--card-bg);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card__face--back {
+  transform: rotateY(180deg);
+  background:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.12) 0 6px, transparent 6px 12px),
+    var(--card-back);
+  border: 4px solid var(--card-bg);
+}
+
+.card--red {
+  color: var(--card-red);
+}
+
+.card__corner {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.05;
+}
+
+.card__corner--bottom {
+  top: auto;
+  left: auto;
+  bottom: 6px;
+  right: 8px;
+  transform: rotate(180deg);
+}
+
+.card__pip {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 2.4rem;
+}
+
+/* Cards slide in from the top-right, where the shoe would sit. */
+@keyframes deal {
+  from {
+    opacity: 0;
+    transform: translate(160px, -90px) rotate(12deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Action buttons
+   ========================================================================== */
+.actions {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 6px;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent, var(--border));
+  border-radius: 10px;
+  background: var(--surface);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.action:hover:not(:disabled) {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.action:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.action:focus-visible,
+.next-btn:focus-visible,
+.link-btn:focus-visible {
+  outline: 3px solid var(--double);
+  outline-offset: 2px;
+}
+
+.action:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.action--hit       { --accent: var(--text-muted); }
+.action--stand     { --accent: var(--stand); }
+.action--double    { --accent: var(--double); }
+.action--split     { --accent: var(--split); }
+.action--surrender { --accent: var(--surrender); }
+
+.action.is-correct {
+  opacity: 1;
+  background: var(--good-bg);
+  border-color: var(--good);
+  color: var(--good);
+}
+
+.action.is-wrong {
+  opacity: 1;
+  background: var(--bad-bg);
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+/* ==========================================================================
+   Feedback
+   ========================================================================== */
+.feedback {
+  display: grid;
+  gap: 4px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  border-left: 6px solid var(--tone);
+  background: var(--tone-bg);
+}
+
+.feedback[hidden] {
+  display: none;
+}
+
+.feedback.is-correct { --tone: var(--good); --tone-bg: var(--good-bg); }
+.feedback.is-wrong   { --tone: var(--bad);  --tone-bg: var(--bad-bg); }
+
+.feedback p {
+  margin: 0;
+}
+
+.feedback__verdict {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--tone);
+}
+
+.feedback__situation {
+  font-weight: 600;
+}
+
+.feedback__detail {
+  color: var(--text-muted);
+}
+
+.decision-log {
+  display: grid;
+  gap: 2px;
+  margin: 8px 0 0;
+  padding-left: 1.4em;
+  font-size: 0.9rem;
+}
+
+.decision-log[hidden],
+.next-btn[hidden],
+.feedback__outcome[hidden] {
+  display: none;
+}
+
+.decision-log .is-correct::marker { color: var(--good); }
+.decision-log .is-wrong { color: var(--bad); }
+
+.feedback .feedback__outcome {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.feedback__outcome[data-result="pending"] { color: var(--text-muted); }
+.feedback__outcome[data-result="win"]     { color: var(--good); }
+.feedback__outcome[data-result="lose"]    { color: var(--bad); }
+
+/* The table felt clips cards mid-deal so they don't fly over the page. */
+.table {
+  overflow: hidden;
+}
+
+.hand__total.is-bust {
+  background: var(--bad);
+  color: #fff;
+}
+
+.hand__cards {
+  flex-wrap: wrap;
+}
+
+.next-btn {
+  justify-self: start;
+  margin-top: 10px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Settings
+   ========================================================================== */
+.settings {
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.settings summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings__form {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.field select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--double);
+}
+
+.link-btn {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bad);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Small screens
+   ========================================================================== */
+@media (max-width: 560px) {
+  .actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .action--surrender {
+    grid-column: span 2;
+  }
+
+  .stats {
+    width: 100%;
+  }
+
+  .stat {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 4px;
+  }
+
+  .stat dt {
+    font-size: 0.62rem;
+    letter-spacing: 0.03em;
+  }
+
+  .card {
+    width: 72px;
+    height: 104px;
+  }
+
+  /* Overlap cards like a real table so long hands stay on one row. */
+  .hand__cards {
+    min-height: 104px;
+    flex-wrap: nowrap;
+    gap: 0;
+  }
+
+  .card + .card {
+    margin-left: -34px;
+  }
+
+  .table {
+    padding: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+
+  .card__inner {
+    transition: none;
+  }
+}

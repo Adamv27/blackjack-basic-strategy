@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Practice blackjack basic strategy: get dealt a hand, pick your play, and see if it matches the chart.">
+  <title>Basic Strategy Trainer</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="assets/js/cards.js" defer></script>
+  <script src="assets/js/strategy.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="site-title">Basic Strategy Trainer</h1>
+    <dl class="stats" aria-label="Your stats">
+      <div class="stat"><dt>Accuracy</dt><dd id="stat-accuracy">—</dd></div>
+      <div class="stat"><dt>Decisions</dt><dd id="stat-hands">0</dd></div>
+      <div class="stat"><dt>Streak</dt><dd id="stat-streak">0</dd></div>
+      <div class="stat"><dt>Best</dt><dd id="stat-best">0</dd></div>
+    </dl>
+  </header>
+
+  <main class="layout">
+    <section class="table" aria-label="Blackjack table">
+      <div class="hand">
+        <h2 class="hand__label">Dealer <span class="hand__total" id="dealer-total" hidden></span></h2>
+        <div class="hand__cards" id="dealer-cards"></div>
+      </div>
+
+      <div class="hand">
+        <h2 class="hand__label">You <span class="hand__total" id="player-total"></span></h2>
+        <div class="hand__cards" id="player-cards"></div>
+      </div>
+    </section>
+
+    <section class="actions" aria-label="Choose your play">
+      <button type="button" class="action action--hit" data-action="hit">Hit <kbd>H</kbd></button>
+      <button type="button" class="action action--stand" data-action="stand">Stand <kbd>S</kbd></button>
+      <button type="button" class="action action--double" data-action="double">Double <kbd>D</kbd></button>
+      <button type="button" class="action action--split" data-action="split">Split <kbd>P</kbd></button>
+      <button type="button" class="action action--surrender" data-action="surrender">Surrender <kbd>R</kbd></button>
+    </section>
+
+    <section class="feedback" id="feedback" aria-live="polite" hidden>
+      <p class="feedback__verdict" id="feedback-verdict"></p>
+      <p class="feedback__situation" id="feedback-situation"></p>
+      <p class="feedback__detail" id="feedback-detail"></p>
+      <ol class="decision-log" id="decision-log" aria-label="Decisions this hand" hidden></ol>
+      <p class="feedback__outcome" id="hand-outcome" hidden></p>
+      <button type="button" class="next-btn" id="next-hand" hidden>Next hand <kbd>Enter</kbd></button>
+    </section>
+
+    <details class="settings">
+      <summary>Settings</summary>
+      <form class="settings__form" id="settings-form">
+        <label class="field">
+          <span>Practice</span>
+          <select name="focus">
+            <option value="all">All hands</option>
+            <option value="hard">Hard totals</option>
+            <option value="soft">Soft totals</option>
+            <option value="pairs">Pairs</option>
+          </select>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" name="showTotals">
+          <span>Show hand totals</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" name="doubleAfterSplit">
+          <span>Double after split (DAS) allowed</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" name="surrender">
+          <span>Late surrender allowed</span>
+        </label>
+        <button type="button" class="link-btn" id="reset-stats">Reset stats</button>
+      </form>
+    </details>
+  </main>
+
+  <footer class="site-footer">
+    <p>Dealer hits soft 17 and checks for blackjack. Insurance or even money: never take it.</p>
+  </footer>
+</body>
+</html>
