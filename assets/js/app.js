@@ -77,6 +77,7 @@
   // --------------------------------------------------------------------------
   const $ = (id) => document.getElementById(id);
   const el = {
+    dock: $('dock'),
     dealerCards: $('dealer-cards'),
     dealerTotal: $('dealer-total'),
     playerCards: $('player-cards'),
@@ -245,6 +246,20 @@
     renderStats();
     renderFeedback();
     updateButtons();
+    el.dock.classList.toggle('is-done', state.phase === 'done');
+  }
+
+  /**
+   * On phones the dock is fixed to the bottom of the screen; mirror its height
+   * into --dock-h so the page can pad itself and nothing hides behind it.
+   */
+  function watchDockHeight() {
+    if (!('ResizeObserver' in window)) return;
+    const root = document.documentElement;
+    new ResizeObserver(() => {
+      const fixed = getComputedStyle(el.dock).position === 'fixed';
+      root.style.setProperty('--dock-h', fixed ? `${el.dock.offsetHeight}px` : '0px');
+    }).observe(el.dock);
   }
 
   // --------------------------------------------------------------------------
@@ -484,6 +499,7 @@
     document.addEventListener('keydown', onKeyDown);
 
     syncSettingsForm();
+    watchDockHeight();
     renderStats();
     dealHand();
   }

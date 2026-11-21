@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Practice blackjack basic strategy: get dealt a hand, pick your play, and see if it matches the chart.">
   <title>Basic Strategy Trainer</title>
   <link rel="stylesheet" href="assets/css/styles.css">
@@ -34,6 +34,8 @@
       </div>
     </section>
 
+    <!-- Actions + feedback. On phones this docks to the bottom of the screen. -->
+    <div class="dock" id="dock">
     <section class="actions" aria-label="Choose your play">
       <button type="button" class="action action--hit" data-action="hit">Hit <kbd>H</kbd></button>
       <button type="button" class="action action--stand" data-action="stand">Stand <kbd>S</kbd></button>
@@ -50,6 +52,7 @@
       <p class="feedback__outcome" id="hand-outcome" hidden></p>
       <button type="button" class="next-btn" id="next-hand" hidden>Next hand <kbd>Enter</kbd></button>
     </section>
+    </div>
 
     <details class="settings">
       <summary>Settings</summary>
